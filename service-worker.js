@@ -1,1 +1,1 @@
-self.addEventListener('install',event=>event.waitUntil(caches.open('eguestbook-v1').then(cache=>cache.addAll(['/','/index.html','/manifest.webmanifest']))));self.addEventListener('fetch',event=>event.respondWith(caches.match(event.request).then(hit=>hit||fetch(event.request))));
+self.addEventListener('install',event=>event.waitUntil(caches.open('eguestbook-v2').then(cache=>cache.addAll(['/','/index.html','/manifest.webmanifest','/icon.svg']))));self.addEventListener('fetch',event=>event.respondWith(caches.match(event.request).then(hit=>hit||fetch(event.request))));
