@@ -8,7 +8,7 @@
     const screen=document.createElement('section');
     screen.className='wedding-welcome';
     screen.innerHTML=`<div class="welcome-content"><p class="welcome-kicker">Welcome to our wedding</p><img class="welcome-logo" src="${src}" alt="WANWAN Video Guestbook"><button class="welcome-enter">เริ่มบันทึกคำอวยพร</button><br><button class="welcome-admin">Admin</button></div>`;
-    screen.querySelector('.welcome-enter').onclick=async()=>{screen.classList.add('leaving');try{const preview=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'user'},aspectRatio:{ideal:3/4}},audio:true});$('camera').srcObject=preview;window.wanwanPreviewStream=preview;$('status').textContent='กล้องพร้อมแล้ว'}catch(e){$('status').textContent=e.name==='NotAllowedError'?'กรุณาอนุญาตกล้องและไมโครโฟนในเบราว์เซอร์':'ไม่สามารถเปิดกล้องได้'}setTimeout(()=>screen.remove(),550)};
+    screen.querySelector('.welcome-enter').onclick=async()=>{screen.classList.add('leaving');setTimeout(()=>screen.remove(),550);try{const preview=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'user'},aspectRatio:{ideal:3/4}},audio:true});$('camera').srcObject=preview;window.wanwanPreviewStream=preview;$('status').textContent='กล้องพร้อมแล้ว'}catch(e){$('status').textContent=e.name==='NotAllowedError'?'กรุณาอนุญาตกล้องและไมโครโฟนในเบราว์เซอร์':'ไม่สามารถเปิดกล้องได้'}};
     screen.querySelector('.welcome-admin').onclick=()=>{screen.remove();$('admin').click()};
     document.body.append(screen);
   }
