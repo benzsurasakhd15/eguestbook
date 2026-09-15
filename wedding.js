@@ -7,7 +7,7 @@
     const screen=document.createElement('section');
     screen.className='wedding-welcome';
     screen.innerHTML=`<div class="welcome-content"><p class="welcome-kicker">Welcome to our wedding</p><img class="welcome-logo" src="${src}" alt="WANWAN Video Guestbook"><p class="welcome-sub">เก็บวันนี้ ไว้คิดถึงในวันวาน</p><button class="welcome-enter">เริ่มบันทึกคำอวยพร</button><br><button class="welcome-admin">Admin</button></div>`;
-    screen.querySelector('.welcome-enter').onclick=()=>screen.remove();
+    screen.querySelector('.welcome-enter').onclick=()=>{screen.classList.add('leaving');setTimeout(()=>screen.remove(),550)};
     screen.querySelector('.welcome-admin').onclick=()=>{screen.remove();$('admin').click()};
     document.body.append(screen);
   }
