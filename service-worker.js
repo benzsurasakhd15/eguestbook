@@ -1,4 +1,4 @@
-const CACHE='wanwan-v6';
+const CACHE='wanwan-v7';
 const ASSETS=['/','/index.html','/manifest.webmanifest','/wanwan-icon.svg','/wanwan-logo.png','/wedding.css','/motion.css','/refine.css','/audio.css','/sound.js','/wedding.js'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
