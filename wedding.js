@@ -23,5 +23,14 @@
   async function renameLatestFile(){
     const request=indexedDB.open('eGuestbookMedia',1);request.onsuccess=()=>{const database=request.result;const tx=database.transaction('media','readwrite');const store=tx.objectStore('media');const all=store.getAll();all.onsuccess=()=>{const latest=all.result.sort((a,b)=>b.created-a.created)[0];if(!latest)return;const d=new Date(latest.created);const date=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');const time=[String(d.getHours()).padStart(2,'0'),String(d.getMinutes()).padStart(2,'0'),String(d.getSeconds()).padStart(2,'0')].join('-');latest.name=`${date}_${time}.${latest.type==='video'?'webm':'jpg'}`;store.put(latest)}};
   }
-  document.addEventListener('DOMContentLoaded',()=>{welcome();addLogoControl();const save=$('saveMedia'),original=save.onclick;save.onclick=async event=>{await original.call(save,event);await renameLatestFile()};const record=$('record'),recordOriginal=record.onclick;record.onclick=async event=>{if(window.wanwanPreviewStream){window.wanwanPreviewStream.getTracks().forEach(track=>track.stop());window.wanwanPreviewStream=null}return recordOriginal.call(record,event)}});
+  async function saveToDevice(){
+    const media=$('#reviewMedia video,#reviewMedia img');if(!media?.src)return;
+    const blob=await fetch(media.src).then(response=>response.blob());
+    const video=media.tagName==='VIDEO',now=new Date();
+    const extension=video?(blob.type.includes('mp4')?'mp4':'webm'):'jpg';const name=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}-${String(now.getMinutes()).padStart(2,'0')}-${String(now.getSeconds()).padStart(2,'0')}.${extension}`;
+    const file=new File([blob],name,{type:blob.type|| (video?'video/webm':'image/jpeg')});
+    if(navigator.canShare?.({files:[file]})){await navigator.share({files:[file],title:'WANWAN Video Guestbook'});return}
+    const link=document.createElement('a');link.href=media.src;link.download=name;document.body.append(link);link.click();link.remove();
+  }
+  document.addEventListener('DOMContentLoaded',()=>{welcome();addLogoControl();const save=$('saveMedia'),original=save.onclick;save.textContent='บันทึกลงเครื่องและคลัง';const note=document.createElement('p');note.className='save-gallery-note';note.textContent='iPhone: เลือก “บันทึกวิดีโอ” หรือ “บันทึกรูปภาพ” จากเมนูแชร์';save.closest('.actions').after(note);save.onclick=async event=>{try{await saveToDevice()}catch(error){}await original.call(save,event);await renameLatestFile()};const record=$('record'),recordOriginal=record.onclick;record.onclick=async event=>{window.WanwanSound?.stop();if(window.wanwanPreviewStream){window.wanwanPreviewStream.getTracks().forEach(track=>track.stop());window.wanwanPreviewStream=null}return recordOriginal.call(record,event)}});
 })();
