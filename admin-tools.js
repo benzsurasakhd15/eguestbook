@@ -7,7 +7,7 @@
   function soundButton(){return $('soundControl')}
   function updateSound(){const button=soundButton();if(button)button.textContent=audio&&!audio.paused?'♪ ปิดเพลง':'♪ เปิดเพลง'}
   async function loadMusic(){const file=await getAudio();if(!file?.blob)return false;audio?.pause();if(audioUrl)URL.revokeObjectURL(audioUrl);audioUrl=URL.createObjectURL(file.blob);audio=new Audio(audioUrl);audio.loop=true;audio.preload='auto';audio.playsInline=true;audio.onplay=updateSound;audio.onpause=updateSound;return true}
-  async function startMusic(){wantsMusic=true;if(await loadMusic()){try{await audio.play();return true}catch{alert('iPhone ต้องกดปุ่ม “เปิดเพลง” อีกครั้งหลังอัปโหลดเพลง')} }window.WanwanSound?.start?.();return false}
+  async function startMusic(){wantsMusic=true;if(!audio)await loadMusic();if(audio){try{await audio.play();return true}catch{alert('iPhone ต้องกดปุ่ม “เปิดเพลง” อีกครั้งหลังอัปโหลดเพลง')} }window.WanwanSound?.start?.();return false}
   function stopMusic(){wantsMusic=false;audio?.pause();window.WanwanSound?.stop?.();updateSound()}
   function pauseMusic(){audio?.pause();window.WanwanSound?.pause?.();}
   function addMusicControl(){
