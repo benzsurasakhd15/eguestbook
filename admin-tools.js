@@ -1,12 +1,13 @@
 (()=>{
   const $=id=>document.getElementById(id);
-  let audio, audioUrl, wantsMusic=false, selected=new Set(), pendingBulk=[];
+  let audio=new Audio('wanwan-jazz.mp3'), audioUrl, wantsMusic=false, selected=new Set(), pendingBulk=[];
+  audio.loop=true;audio.preload='auto';audio.playsInline=true;
   const audioDb=()=>new Promise((resolve,reject)=>{const r=indexedDB.open('wanwanAudio',1);r.onupgradeneeded=()=>r.result.createObjectStore('assets');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)});
   const getAudio=async()=>{const database=await audioDb();return new Promise((resolve,reject)=>{const r=database.transaction('assets').objectStore('assets').get('background');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})};
   const setAudio=value=>audioDb().then(database=>new Promise((resolve,reject)=>{const r=database.transaction('assets','readwrite').objectStore('assets').put(value,'background');r.onsuccess=resolve;r.onerror=()=>reject(r.error)}));
   function soundButton(){return $('soundControl')}
   function updateSound(){const button=soundButton();if(button)button.textContent=audio&&!audio.paused?'♪ ปิดเพลง':'♪ เปิดเพลง'}
-  async function loadMusic(){const file=await getAudio();if(!file?.blob)return false;audio?.pause();if(audioUrl)URL.revokeObjectURL(audioUrl);audioUrl=URL.createObjectURL(file.blob);audio=new Audio(audioUrl);audio.loop=true;audio.preload='auto';audio.playsInline=true;audio.onplay=updateSound;audio.onpause=updateSound;return true}
+  async function loadMusic(){const file=await getAudio();if(file?.blob){audio?.pause();if(audioUrl)URL.revokeObjectURL(audioUrl);audioUrl=URL.createObjectURL(file.blob);audio=new Audio(audioUrl)}audio.loop=true;audio.preload='auto';audio.playsInline=true;audio.onplay=updateSound;audio.onpause=updateSound;return true}
   async function startMusic(){wantsMusic=true;if(!audio)await loadMusic();if(audio){try{await audio.play();return true}catch{alert('iPhone ต้องกดปุ่ม “เปิดเพลง” อีกครั้งหลังอัปโหลดเพลง')} }window.WanwanSound?.start?.();return false}
   function stopMusic(){wantsMusic=false;audio?.pause();window.WanwanSound?.stop?.();updateSound()}
   function pauseMusic(){audio?.pause();window.WanwanSound?.pause?.();}
@@ -36,6 +37,7 @@
   function init(){
     addMusicControl();loadMusic().catch(()=>{});
     const button=soundButton();if(button)button.onclick=event=>{event.stopPropagation();if(audio&&!audio.paused)stopMusic();else startMusic()};
+    document.addEventListener('pointerdown',event=>{if(event.target.closest('.welcome-enter')&&!wantsMusic)startMusic()},{capture:true});
     const originalPause=window.WanwanSound?.pause;window.WanwanSound={...window.WanwanSound,pause:()=>{audio?.pause();originalPause?.()}};
     new MutationObserver(()=>{if(wantsMusic&&!$('record').classList.contains('live'))audio?.play().catch(()=>{})}).observe($('record'),{attributes:true,attributeFilter:['class']});
     const oldDelete=$('delete').onclick;$('delete').onclick=async()=>{if(pendingBulk.length){if($('deletePin').value!==pin)return;for(const item of pendingBulk)await remove(item.id);pendingBulk=[];selected.clear();await updateStats();bulkRender();show('files');return}return oldDelete()};
